@@ -1,0 +1,30 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/tommy-021/fullstack_course#readme",
+  "bugs": {
+    "url": "https://github.com/tommy-021/fullstack_course/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tommy-021/fullstack_course.git"
+  },
+  "license": "ISC",
+  "author": "tommy.brtek@gmail.com",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "devDependencies": {
+    "@eslint/css": "^0.9.0",
+    "@eslint/js": "^9.30.1",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.3.0",
+    "typescript-eslint": "^8.36.0"
+  }
+}
