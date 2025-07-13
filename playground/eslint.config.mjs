@@ -3,6 +3,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 import css from "@eslint/css";
+import stylistic from '@stylistic/eslint-plugin';
 import { defineConfig } from "eslint/config";
 
 
@@ -12,5 +13,6 @@ export default defineConfig([
   { rules: { semi: ["error", "always"]} },
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
+  stylistic.configs.recommended,
   { files: ["**/*.css"], plugins: { css }, language: "css/css", extends: ["css/recommended"] },
 ]);
