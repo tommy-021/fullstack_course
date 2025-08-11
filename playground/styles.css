@@ -1,0 +1,88 @@
+/* Obecný styl stránky */
+body {
+    font-family: Arial, sans-serif;
+    margin: 50px;
+}
+/* Styl pro hlavičku a patičku tabulky */
+thead th, tfoot td {
+    font-weight: bold;
+    border: 1px solid black;
+    padding: 5px 10px 5px 10px;
+}
+/* Styl pro buňky tabulky (bez rámečků pro tbody) */
+tbody td {
+    border: none;
+    padding: 5px 10px 5px 10px;
+}
+/* Rozlišení sudých a lichých řádků */
+tbody tr:nth-child(even) {
+    background-color: #f2f2ff;
+}
+tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+/* Hover efekt */
+tbody tr:hover {
+    background-color: #e0f7fa;
+}
+/* Styl formuláře – grid layout */
+form {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: end;
+}
+
+/* Responzivní design */
+@media (min-width: 1400px) {
+    form {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+    form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, auto);
+        gap: 8px 10px;
+    }
+    /* Umístění jednotlivých polí */
+    #first_name {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    #last_name {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    #email {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    #phone {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    button {
+        grid-column: 3;
+        grid-row: 2;
+        justify-self: start;
+    }
+}
+
+@media (max-width: 767px) {
+    form {
+        grid-template-columns: 1fr;
+    }
+}
+
+form label {
+    font-weight: bold;
+}
+
+form input, form button {
+    padding: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
