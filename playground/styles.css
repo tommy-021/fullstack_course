@@ -30,15 +30,13 @@ form {
     display: grid;
     gap: 10px;
     margin-top: 20px;
+    align-items: end;
 }
 
 /* Responzivní design */
 @media (min-width: 1400px) {
     form {
         grid-template-columns: repeat(5, 1fr);
-    }
-    form label {
-        display: none; /* skryj labely na velké obrazovce */
     }
 }
 
@@ -48,9 +46,6 @@ form {
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(2, auto);
         gap: 8px 10px;
-    }
-    form label {
-        display: none;
     }
     /* Umístění jednotlivých polí */
     #first_name {
@@ -80,9 +75,6 @@ form {
     form {
         grid-template-columns: 1fr;
     }
-    input::placeholder {
-        color: transparent;
-    }
 }
 
 form label {
@@ -94,5 +86,3 @@ form input, form button {
     width: 100%;
     box-sizing: border-box;
 }
-
-
