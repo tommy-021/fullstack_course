@@ -4,34 +4,55 @@ window.document.getElementById('button').addEventListener('click', async () => {
     const cities = document.querySelector('textarea').value
         .split(/[,;]/)
         .map((city) => city.trim())
-        .filter(Boolean);
+        .filter(Boolean); // Odfiltrule falsy hodnoty (0, null, undefined, Nan, flase)
 
-    // Kontrola prázdného vstupu
+    // Kontrola prazdneho vstupu
     if (cities.length === 0) {
         window.alert('Musíte zadat alespoň jedno město.');
         return;
     }
 
-    // Kontrola maximálního počtu měst
+    // Kontrola maximalniho poctu mest
     if (cities.length > 3) {
         window.alert('Mohou být zadána maximálně tři města.');
         return;
     }
 
-    // Načte souradnice a zavola dotaz na pocasi
-    for (let i = 0; i < cities.length && i < 3; i++) {
-        const cityCoords = await getCityCoords(cities[i]);
+    // Ziska vsechny souradnice paralelne (najednou)
+    const geoResults = await Promise.allSettled(cities.map(getCityCoords));
+    console.log(geoResults); // pro me
 
-        print(`\nPocasi pro ${cities[i]} je:`);
-        let forecast = await getForecast(cityCoords.latitude, cityCoords.longitude);
-        print(` ${forecast.temp_avg} ${forecast.temp_unit}`);
-    }
+    // Vyfiltruje pouze fulfilled
+    const validCities = geoResults.map((res, i) => {
+        if (res.status !== 'fulfilled' || !res.value
+            || !Number.isFinite(res.value.latitude) || !Number.isFinite(res.value.longitude)) {
+            print(`\nMěsto "${cities[i]}" nebylo nalezeno.`);
+            return null;
+        }
+        return { name: cities[i], coords: res.value };
+    }).filter(Boolean);
+
+    // Ziska vsechny predpovdi paralelne
+    const forecastResults = await Promise.allSettled(
+        validCities.map((city) => getForecast(city.coords.latitude, city.coords.longitude)),
+    );
+
+    // Vypise vysledky
+    forecastResults.forEach((res, i) => {
+        const cityName = validCities[i].name;
+        if (res.status !== 'fulfilled' || !res.value) {
+            print(`\nPředpověď pro "${cityName}" není dostupná.`);
+            return;
+        }
+        print(`\nPočasí pro ${cityName} je:`);
+        print(` ${res.value.temp_avg.toFixed(2)} ${res.value.temp_unit}`);
+    });
 });
 
 // API volani
 const getCityCoords = async (cityName) => {
     try {
-        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&language=en&format=json`, {
+        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&language=en&format=json`, {
             method: 'GET',
         });
 
@@ -46,8 +67,7 @@ const getCityCoords = async (cityName) => {
         return { latitude, longitude };
     }
     catch (error) {
-        window.alert(error.message);
-        return undefined;
+        throw error;
     }
 };
 
@@ -68,8 +88,8 @@ const getForecast = async (latitude, longitude) => {
         const temp_avg = (temp_max + temp_min) / 2;
         return { temp_avg, temp_unit };
     }
-    catch (e) {
-        window.alert(e.message);
+    catch (error) {
+        throw error;
     }
 };
 
