@@ -67,7 +67,7 @@ const getCityCoords = async (cityName) => {
         return { latitude, longitude };
     }
     catch (error) {
-        throw error;
+        console.log(error.message);
     }
 };
 
@@ -89,7 +89,7 @@ const getForecast = async (latitude, longitude) => {
         return { temp_avg, temp_unit };
     }
     catch (error) {
-        throw error;
+        console.log('Chyba: ' + error.message);
     }
 };
 
