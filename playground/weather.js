@@ -23,6 +23,7 @@ window.document.getElementById('button').addEventListener('click', async () => {
     console.log(geoResults); // pro me
 
     // Vyfiltruje pouze fulfilled
+    /*
     const validCities = geoResults.map((res, i) => {
         if (res.status !== 'fulfilled' || !res.value
             || !Number.isFinite(res.value.latitude) || !Number.isFinite(res.value.longitude)) {
@@ -31,6 +32,19 @@ window.document.getElementById('button').addEventListener('click', async () => {
         }
         return { name: cities[i], coords: res.value };
     }).filter(Boolean);
+    */
+
+    // Nizsi slozitost, protoze pole validCities prochazim jen jednou
+    const validCities = [];
+    geoResults.forEach((res, i) => {
+        if (res.status !== 'fulfilled' || !res.value
+            || !Number.isFinite(res.value.latitude) || !Number.isFinite(res.value.longitude)) {
+            print(`\nMěsto "${cities[i]}" nebylo nalezeno.`);
+            print(`\nMěsto "${res.value.name}" nebylo nalezeno.`);
+            return;
+        }
+        validCities.push({ name: cities[i], coords: res.value });
+    });
 
     // Ziska vsechny predpovdi paralelne
     const forecastResults = await Promise.allSettled(
@@ -80,7 +94,6 @@ const getForecast = async (latitude, longitude) => {
         if (!response.ok) {
             throw new Error('Nemůže najít předpověď');
         }
-
         const jsonResponse = await response.json();
         const temp_unit = jsonResponse.daily_units.temperature_2m_max;
         const temp_max = jsonResponse.daily.temperature_2m_max[1];
