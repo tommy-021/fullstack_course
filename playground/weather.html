@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="cs">
+    <head>
+        <meta charset="UTF-8">
+        <title>Předpověď počasí</title>
+        <link rel="stylesheet" href="weather.css" />
+    </head>
+    <body>
+        <main class="container">
+            <h1>Předpověď počasí</h1>
+            <form id="weather-form" novalidate>
+                <label for="cities">Zadejte až 3 města (oddělená čárkou nebo středníkem)</label>
+                <div>
+                    <textarea id="cities" name="cities" rows="4" required></textarea>
+                </div>
+                <button id="button" type="button">Získat předpověď</button>
+            </form>
+            <section id="results" class="results" aria-label="Výsledky předpovědi"></section>
+            <section aria-label="Výsledky předpovědi">
+                <pre id="results-show"></pre>
+            </section>
+        </main>
+        <script src="./weather.js"></script>
+    </body>
+</html>
