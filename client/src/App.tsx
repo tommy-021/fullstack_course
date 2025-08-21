@@ -3,6 +3,10 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 
+export const Event: React.FC<EventProps> = (props) => {
+    return;
+};
+
 function App() {
     const [count, setCount] = useState(0);
 

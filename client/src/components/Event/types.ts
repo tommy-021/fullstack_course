@@ -1,6 +1,6 @@
 export type UserRecord = {
     name: string;
-    answer: "yes" | "no" | "if-needed";
+    answer: 'yes' | 'no' | 'if-needed';
 };
 
 export type DateRecord = {
