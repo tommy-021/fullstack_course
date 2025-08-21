@@ -40,7 +40,6 @@ window.document.getElementById('button').addEventListener('click', async () => {
         if (res.status !== 'fulfilled' || !res.value
             || !Number.isFinite(res.value.latitude) || !Number.isFinite(res.value.longitude)) {
             print(`\nMěsto "${cities[i]}" nebylo nalezeno.`);
-            print(`\nMěsto "${res.value.name}" nebylo nalezeno.`);
             return;
         }
         validCities.push({ name: cities[i], coords: res.value });
@@ -77,7 +76,7 @@ const getCityCoords = async (cityName) => {
 
         const jsonResponse = await response.json();
         const { latitude, longitude } = jsonResponse.results?.[0]; // vysvetleni: pokud neni result, vrati undefined
-        console.log(latitude, longitude);
+        console.log(latitude, longitude, name);
         return { latitude, longitude };
     }
     catch (error) {
