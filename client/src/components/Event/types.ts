@@ -8,7 +8,7 @@ export type DateRecord = {
     records: UserRecord[];
 };
 
-// props komponenty Event
+// props komponenty Event_pokus
 export type EventProps = {
     location?: string;
     id: string;
