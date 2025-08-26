@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Event } from './Event';
-import { eventsData } from '../../data'; // cesta podle tvého projektu
+import { eventsData } from '../../data';
 
 describe('Komponenta Event – testy pro eventsData', () => {
     eventsData.forEach((event) => {
