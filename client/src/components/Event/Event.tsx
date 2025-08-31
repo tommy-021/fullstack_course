@@ -3,7 +3,13 @@ import { EventProps, UserRecord } from './types';
 
 type VotesMap = Record<string, Record<number, UserRecord['answer']>>;
 
-export const Event: React.FC<EventProps> = ({ location, title, dates }) => {
+export const Event: React.FC<EventProps & { children?: React.ReactNode }> = ({
+    location,
+    title,
+    dates,
+    children,
+}) => {
+    // Seznam všech unikátních jmen napříč všemi daty
     const allNames = React.useMemo(() => {
         const names = new Set<string>();
         dates.forEach((date) => {
@@ -36,6 +42,9 @@ export const Event: React.FC<EventProps> = ({ location, title, dates }) => {
                     {location}
                 </p>
             )}
+            <p>
+                {children}
+            </p>
 
             {dates.length === 0 && <p>Žádná data</p>}
 

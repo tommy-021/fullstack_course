@@ -8,15 +8,14 @@ export function EventDetail({ event }: { event?: PollingEvent }) {
     }
     return (
         <div className="event-detail">
-            <WeatherPanel
-                location={event.location}
-            />
             <EventTable
                 id={event.id}
                 title={event.title}
                 dates={event.dates}
                 location={event.location}
-            />
+            >
+                <WeatherPanel location={event.location} />
+            </EventTable>
         </div>
     );
 }
