@@ -1,0 +1,5 @@
+.event-form{display:flex;flex-direction:column;gap:.75rem;max-width:480px}
+.event-form input{padding:.5rem;border:1px solid #ddd;border-radius:8px;width:100%}
+.event-form .date-row{display:flex;gap:.5rem;align-items:center}
+.event-form .error{background:#ffecec;border:1px solid #f5b5b5;padding:.5rem;border-radius:8px}
+.event-form .success{background:#ecfff1;border:1px solid #b5f5c7;padding:.5rem;border-radius:8px}

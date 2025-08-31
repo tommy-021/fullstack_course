@@ -1,0 +1,5 @@
+.navigation{display:flex;gap:1rem;align-items:center;padding:0.75rem 1rem;border-bottom:1px solid #eee;background:#fafafa}
+.navigation .brand{font-weight:600;text-decoration:none}
+.navigation .links{display:flex;gap:0.75rem}
+.navigation a{text-decoration:none}
+.navigation a.active{border-bottom:2px solid currentColor}
