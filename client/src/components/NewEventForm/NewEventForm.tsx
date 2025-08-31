@@ -5,7 +5,7 @@ type NewEventFormState = {
     name: string;
     title: string;
     location: string;
-    dates: string[]; // ISO date strings from input[type=date]
+    dates: string[];
 };
 
 export function NewEventForm() {
@@ -49,19 +49,27 @@ export function NewEventForm() {
         }
 
         const payload = {
-            name: state.name || 'Team building', // pro kompatibilitu s požadavkem
+            name: state.name || 'Team building',
             location: state.location || undefined,
             title: state.title,
             dates: timestamps,
         };
 
         try {
-            const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const res = await fetch('/api/events', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
             if (!res.ok) throw new Error('Server vrátil chybu');
             setSent(true);
         }
-        catch (e: any) {
-            setError(e?.message || 'Odeslání se nezdařilo');
+        catch (e: unknown) {
+            if (e instanceof Error) {
+                setError(e.message);
+            }
+            else {
+                setError('Odeslání se nezdařilo');
+            }
         }
     }
 

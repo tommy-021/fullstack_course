@@ -42,9 +42,11 @@ export const Event: React.FC<EventProps & { children?: React.ReactNode }> = ({
                     {location}
                 </p>
             )}
-            <p>
-                {children}
-            </p>
+            {children && (
+                <div className="event-extra">
+                    {children}
+                </div>
+            )}
 
             {dates.length === 0 && <p>Žádná data</p>}
 
