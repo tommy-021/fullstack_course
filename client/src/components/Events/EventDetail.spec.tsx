@@ -66,9 +66,9 @@ describe('EventDetail ', () => {
         // Název události
         expect(await screen.findByText('Tým building')).toBeInTheDocument();
 
-        // Počasí – zobrazuje číslo s °C (žádný vítr netestujeme)
+        // Počasí – zkontroluj teplotu
         await waitFor(() =>
-            expect(screen.getByTestId('weather')).toHaveTextContent(/\d+(\.\d+)?°C/),
+            expect(screen.getByTestId('weather')).toHaveTextContent('22.3°C'),
         );
 
         // Tabulka existuje a obsahuje očekávané hodnoty

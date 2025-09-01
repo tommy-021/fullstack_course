@@ -11,7 +11,8 @@ export function useWeather(location?: string) {
         let cancelled = false;
         async function load() {
             if (!location) return;
-            setLoading(true); setError(null);
+            setLoading(true);
+            setError(null);
             try {
                 const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=cs&format=json`;
                 const geoRes = await fetch(geoUrl);
@@ -29,15 +30,22 @@ export function useWeather(location?: string) {
 
                 if (!cancelled) setData({ temperature: cw.temperature });
             }
-            catch (e: any) {
-                if (!cancelled) setError(e?.message || 'Chyba při načítání počasí');
+            catch (e: unknown) {
+                if (e instanceof Error) {
+                    setError(e.message);
+                }
+                else {
+                    setError('Odeslání se nezdařilo');
+                }
             }
             finally {
                 if (!cancelled) setLoading(false);
             }
         }
         load();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+        };
     }, [location]);
 
     return { data, loading, error };

@@ -7,7 +7,7 @@ export function EventsList({ data }: EventsListProps) {
         <ul className="events-list">
             {data.map((ev) => (
                 <li key={String(ev.id)} className="events-list-item">
-                    <Link to={`/events/${encodeURIComponent(String(ev.id))}`}>{ev.title}</Link>
+                    <Link to={`/events/${encodeURIComponent(ev.id)}`}>{ev.title}</Link>
                 </li>
             ))}
             {data.length === 0 && <li className="no-data">Žádné události</li>}

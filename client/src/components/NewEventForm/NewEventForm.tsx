@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import './form.css';
 
 type NewEventFormState = {
@@ -31,7 +31,7 @@ export function NewEventForm() {
         setState((s) => ({ ...s, dates: s.dates.filter((_, i) => i !== idx) }));
     }
 
-    async function onSubmit(e: React.FormEvent) {
+    async function onSubmit(e: FormEvent) {
         e.preventDefault();
         setError(null);
         setSent(false);
@@ -40,9 +40,12 @@ export function NewEventForm() {
             setError('Název je povinný');
             return;
         }
-        const timestamps = state.dates
-            .map((d) => d && Date.parse(d))
+        const timestamps: number[] = state.dates
+            .map((d) => d.trim())
+            .filter((d) => d.length > 0)
+            .map((d) => Date.parse(d))
             .filter((n): n is number => !Number.isNaN(n));
+
         if (timestamps.length === 0) {
             setError('Přidejte alespoň jedno datum');
             return;
