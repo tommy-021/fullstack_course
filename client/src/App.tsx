@@ -1,21 +1,26 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import { Event } from './components/Event/Event.tsx';
-import { eventsData } from './data.ts';
+import { eventsData } from './data';
+import { Navigation } from './components/Navigation/Navigation';
+import { EventsPage } from './components/Events/EventsPage';
+import { NewEventForm } from './components/NewEventForm/NewEventForm';
 
-function App() {
+export default function App() {
     return (
-        <div className="demo">
-            {eventsData.map((event) => (
-                <Event
-                    key={event.id} // vždycky unikátní klíč
-                    id={event.id}
-                    title={event.title}
-                    location={event.location}
-                    dates={event.dates}
-                />
-            ))}
-        </div>
+        <BrowserRouter>
+            <div className="app-shell">
+                <Navigation />
+                <div className="page-container">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/events" replace />} />
+                        {/* Nest everything under /events so parent can pass data to detail */}
+                        <Route path="/events/*" element={<EventsPage data={eventsData} />} />
+                        <Route path="/events/new" element={<NewEventForm />} />
+                        {/* Fallback */}
+                        <Route path="*" element={<Navigate to="/events" replace />} />
+                    </Routes>
+                </div>
+            </div>
+        </BrowserRouter>
     );
 }
-
-export default App;
