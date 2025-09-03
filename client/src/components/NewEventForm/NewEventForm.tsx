@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom'; // přidáno
 import './form.css';
 
 type NewEventFormState = {
@@ -12,6 +13,7 @@ export function NewEventForm() {
     const [state, setState] = useState<NewEventFormState>({ name: '', title: '', location: '', dates: [''] });
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
+    const navigate = useNavigate(); // přidáno
 
     const canAddMore = state.dates.length < 10;
 
@@ -59,12 +61,13 @@ export function NewEventForm() {
         };
 
         try {
-            const res = await fetch('/api/events', {
+            const res = await fetch('http://localhost:4000/api/events', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error('Server vrátil chybu');
             setSent(true);
+            navigate('/events'); // požadovaný redirect
         }
         catch (e: unknown) {
             if (e instanceof Error) {

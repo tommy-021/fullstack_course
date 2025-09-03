@@ -1,10 +1,9 @@
-// src/components/Events/EventDetail.spec.tsx
 import { render, screen, waitFor, cleanup, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { EventsPage } from './EventsPage';
 import type { PollingEvent } from './types';
 
-const mockData: PollingEvent[] = [
+const data: PollingEvent[] = [
     {
         id: '1',
         title: 'Tým building',
@@ -38,8 +37,11 @@ describe('EventDetail ', () => {
         (global.fetch as jest.Mock | undefined)?.mockClear?.();
     });
 
-    test('renderuje detail + tabulku + aktuální teplotu', async () => {
+    test('renderuje detail + tabulku + aktuální teplotu (id=1)', async () => {
         global.fetch = jest.fn(async (url: string) => {
+            if (url.includes('/api/events/1')) {
+                return { ok: true, json: async () => data[0] } as Response;
+            }
             if (url.includes('geocoding-api')) {
                 return {
                     ok: true,
@@ -49,7 +51,7 @@ describe('EventDetail ', () => {
             if (url.includes('api.open-meteo.com')) {
                 return {
                     ok: true,
-                    json: async () => ({ current_weather: { temperature: 22.3 } }), // pouze teplota
+                    json: async () => ({ current_weather: { temperature: 22.3 } }),
                 } as Response;
             }
             return { ok: false, json: async () => ({}) } as Response;
@@ -58,7 +60,7 @@ describe('EventDetail ', () => {
         render(
             <MemoryRouter initialEntries={['/events/1']}>
                 <Routes>
-                    <Route path="/events/*" element={<EventsPage data={mockData} />} />
+                    <Route path="/events/*" element={<EventsPage />} />
                 </Routes>
             </MemoryRouter>,
         );
@@ -66,7 +68,7 @@ describe('EventDetail ', () => {
         // Název události
         expect(await screen.findByText('Tým building')).toBeInTheDocument();
 
-        // Počasí – zkontroluj teplotu
+        // Počasí – zkontroluj přesnou teplotu
         await waitFor(() =>
             expect(screen.getByTestId('weather')).toHaveTextContent('22.3°C'),
         );
@@ -78,13 +80,19 @@ describe('EventDetail ', () => {
         expect(within(table).getAllByText(/^no$/i)).toHaveLength(2);
     });
 
-    test('zobrazí chybový stav, když API (geocoding/forecast) selže', async () => {
-        global.fetch = jest.fn(async () => ({ ok: false, json: async () => ({}) })) as jest.Mock;
+    test('zobrazí chybový stav, když API počasí (geocoding/forecast) selže (id=1)', async () => {
+        global.fetch = jest.fn(async (url: string) => {
+            if (url.includes('/api/events/1')) {
+                return { ok: true, json: async () => data[0] } as Response; // detail OK
+            }
+            // Počasí selže
+            return { ok: false, json: async () => ({}) } as Response;
+        }) as jest.Mock;
 
         render(
             <MemoryRouter initialEntries={['/events/1']}>
                 <Routes>
-                    <Route path="/events/*" element={<EventsPage data={mockData} />} />
+                    <Route path="/events/*" element={<EventsPage />} />
                 </Routes>
             </MemoryRouter>,
         );
@@ -95,31 +103,46 @@ describe('EventDetail ', () => {
         );
     });
 
-    test('zobrazí „Událost nebyla nalezena“ pro neexistující ID', async () => {
+    test('zobrazí „Událost nebyla nalezena“ pro neexistující ID (404)', async () => {
+        global.fetch = jest.fn(async (url: string) => {
+            if (url.includes('/api/events/404')) {
+                return { ok: false, status: 404, json: async () => ({}) } as Response;
+            }
+            return { ok: true, json: async () => ({}) } as Response;
+        }) as jest.Mock;
+
         render(
             <MemoryRouter initialEntries={['/events/404']}>
                 <Routes>
-                    <Route path="/events/*" element={<EventsPage data={mockData} />} />
+                    <Route path="/events/*" element={<EventsPage />} />
                 </Routes>
             </MemoryRouter>,
         );
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(/událost nebyla nalezena/i);
+        expect(await screen.findByRole('alert')).toHaveTextContent(/Událost nenalezena/i);
     });
 
-    test('když událost nemá location, WeatherPanel se nenačítá', async () => {
-        global.fetch = jest.fn(async () => ({ ok: true, json: async () => ({}) })) as jest.Mock;
+    test('když událost (id=2) nemá location, WeatherPanel se nenačítá', async () => {
+        global.fetch = jest.fn(async (url: string) => {
+            if (url.includes('/api/events/2')) {
+                return { ok: true, json: async () => data[1] } as Response; // detail bez location
+            }
+            // jakékoliv počasí by se volat nemělo
+            return { ok: true, json: async () => ({}) } as Response;
+        }) as jest.Mock;
 
         render(
             <MemoryRouter initialEntries={['/events/2']}>
                 <Routes>
-                    <Route path="/events/*" element={<EventsPage data={mockData} />} />
+                    <Route path="/events/*" element={<EventsPage />} />
                 </Routes>
             </MemoryRouter>,
         );
 
         expect(await screen.findByText('Bez lokace')).toBeInTheDocument();
         expect(screen.queryByTestId('weather')).toBeNull();
-        expect(screen.queryByRole('alert')).toBeNull();
+        // bezpečnostní aserce: žádné volání na open-meteo/geocoding
+        expect((global.fetch as jest.Mock).mock.calls.some(([u]) => String(u).includes('open-meteo'))).toBe(false);
+        expect((global.fetch as jest.Mock).mock.calls.some(([u]) => String(u).includes('geocoding-api'))).toBe(false);
     });
 });

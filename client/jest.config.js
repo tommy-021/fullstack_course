@@ -8,4 +8,8 @@ export default {
         ...tsJestTransformCfg,
     },
     setupFilesAfterEnv: ['<rootDir>/src/jest.setup.ts'],
+    moduleNameMapper: {
+        '\\.(css|scss|sass|less)$': '<rootDir>/src/test/styleMock.js',
+    },
+
 };
