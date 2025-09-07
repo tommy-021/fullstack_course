@@ -8,16 +8,21 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-doc": "node createDocs.js"
+    "generate-doc": "node createDocs.js",
+    "generate-client": "npx openapi-typescript spec.yaml -o ../client/src/apischeme.d.ts",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@stylistic/eslint-plugin": "^5.3.1",
     "eslint": "^9.35.0",
     "globals": "^16.3.0",
+    "jiti": "^2.5.1",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.42.0"
   },
   "dependencies": {
+    "openapi-fetch": "^0.14.0",
     "swagger-yaml-to-html": "^1.0.3"
   }
 }
