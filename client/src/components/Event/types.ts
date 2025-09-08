@@ -1,17 +1,7 @@
-export type UserRecord = {
-    name: string;
-    answer: 'yes' | 'no' | 'if-needed';
-};
+import type { components } from '../../apischeme';
 
-export type DateRecord = {
-    timestamp: number;
-    records: UserRecord[];
-};
+export type UserRecord = components['schemas']['UserRecord'];
+export type DateRecord = components['schemas']['DateRecord'];
+export type PollingEvent = components['schemas']['PollingEvent'];
 
-// props komponenty Event_pokus
-export type EventProps = {
-    location?: string;
-    id: string;
-    title: string;
-    dates: DateRecord[];
-};
+export type EventProps = Pick<PollingEvent, 'location' | 'title' | 'dates'>;

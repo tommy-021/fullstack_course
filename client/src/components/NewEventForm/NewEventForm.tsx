@@ -1,6 +1,8 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom'; // přidáno
+import { useNavigate } from 'react-router-dom';
 import './form.css';
+import { createEvent } from '../../apiClient';
+import type { CreateEventRequest } from '../../apiClient';
 
 type NewEventFormState = {
     name: string;
@@ -13,7 +15,7 @@ export function NewEventForm() {
     const [state, setState] = useState<NewEventFormState>({ name: '', title: '', location: '', dates: [''] });
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
-    const navigate = useNavigate(); // přidáno
+    const navigate = useNavigate();
 
     const canAddMore = state.dates.length < 10;
 
@@ -53,21 +55,17 @@ export function NewEventForm() {
             return;
         }
 
-        const payload = {
-            name: state.name || 'Team building',
+        const payload: CreateEventRequest = {
+            ...(state.name ? { name: state.name } : {}),
             location: state.location || undefined,
             title: state.title,
             dates: timestamps,
         };
 
         try {
-            const res = await fetch('http://localhost:4000/api/events', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error('Server vrátil chybu');
+            await createEvent(payload);
             setSent(true);
-            navigate('/events'); // požadovaný redirect
+            navigate('/events');
         }
         catch (e: unknown) {
             if (e instanceof Error) {
@@ -88,8 +86,7 @@ export function NewEventForm() {
                 <label>Název *:</label>
                 <input
                     value={state.title}
-                    onChange={(e) =>
-                        update('title', e.target.value)}
+                    onChange={(e) => update('title', e.target.value)}
                     placeholder="Např. Super akce"
                     required
                 />

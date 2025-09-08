@@ -9,7 +9,6 @@ export function EventDetail({ event }: { event?: PollingEvent }) {
     return (
         <div className="event-detail">
             <EventTable
-                id={event.id}
                 title={event.title}
                 dates={event.dates}
                 location={event.location}

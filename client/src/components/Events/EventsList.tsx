@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { PollingEvent } from './types';
+import { listEvents } from '../../apiClient';
 
 export function EventsList() {
     const [data, setData] = useState<PollingEvent[]>([]);
@@ -13,10 +14,8 @@ export function EventsList() {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await fetch('http://localhost:4000/api/events');
-                if (!res.ok) throw new Error(`Chyba serveru: ${res.status}`);
-                const json = await res.json(); // { items: PollingEvent[] }
-                if (!cancelled) setData(json.items ?? []);
+                const items = await listEvents();
+                if (!cancelled) setData(items);
             }
             catch (e: unknown) {
                 if (!cancelled) setError(e instanceof Error ? e.message : 'Chyba při načítání');
