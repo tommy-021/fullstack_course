@@ -3,6 +3,7 @@ import { EventsList } from './EventsList';
 import { EventDetail } from './EventDetail';
 import type { PollingEvent } from './types';
 import { useEffect, useState } from 'react';
+import { getEvent } from '../../apiClient';
 
 export function EventsPage() {
     return (
@@ -23,17 +24,23 @@ function EventDetailLoader() {
         let cancelled = false;
         if (!id) return;
 
+        const numericId = Number(id);
+        if (Number.isNaN(numericId)) {
+            setError('Chybný identifikátor události');
+            return;
+        }
+
         (async () => {
             setLoading(true);
             setError(null);
             try {
-                const res = await fetch(`http://localhost:4000/api/events/${encodeURIComponent(id)}`);
-                if (!res.ok) throw new Error(res.status === 404 ? 'Událost nenalezena' : 'Chyba při načítání detailu');
-                const json = await res.json();
-                if (!cancelled) setData(json);
+                const ev = await getEvent(numericId);
+                if (!cancelled) setData(ev);
             }
             catch (e: unknown) {
-                if (!cancelled) setError(e instanceof Error ? e.message : 'Chyba při načítání');
+                if (!cancelled) {
+                    setError(e instanceof Error ? e.message : 'Chyba při načítání');
+                }
             }
             finally {
                 if (!cancelled) setLoading(false);

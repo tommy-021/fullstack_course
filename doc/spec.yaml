@@ -1,0 +1,123 @@
+openapi: 3.0.3
+info:
+  title: Events API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:4000
+
+paths:
+  /api/events:
+    get:
+      summary: Získá seznam všech událostí
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsListResponse'
+    post:
+      summary: Vytvoří novou událost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '201':
+          description: Událost byla vytvořena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollingEvent'
+        '400':
+          description: Nevalidní vstup
+        '422':
+          description: Chybí data (např. prázdné datumy)
+        '500':
+          description: Server error
+  /api/events/{id}:
+    get:
+      summary: Získat detail konkrétní události
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollingEvent'
+        '400':
+          description: Nevalidní ID
+        '404':
+          description: Událost nenalezena
+components:
+  schemas:
+    UserRecord:
+      type: object
+      required: [name, answer]
+      properties:
+        name:
+          type: string
+        answer:
+          type: string
+          enum: [yes, no, if-needed]
+    DateRecord:
+      type: object
+      required: [timestamp, records]
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRecord'
+    PollingEvent:
+      type: object
+      required: [id, title, dates]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        location:
+          type: string
+        dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateRecord'
+    CreateEventRequest:
+      type: object
+      required: [title, dates]
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        title:
+          type: string
+        dates:
+          type: array
+          items:
+            type: integer
+            format: int32
+    EventsListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PollingEvent'
+    Error:
+      type: object
+      properties:
+        error:
+          type: string

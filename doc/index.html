@@ -1,0 +1,55 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Swagger UI</title>
+            <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
+            <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui.css" >
+            <style>
+                html {
+                    box-sizing: border-box;
+                    overflow: -moz-scrollbars-vertical;
+                    overflow-y: scroll;
+                }
+                *,
+                *:before,
+                *:after {
+                    box-sizing: inherit;
+                }
+                body {
+                    margin:0;
+                    background: #fafafa;
+                }
+                .swagger-ui .parameters-col_description input[type=text]{
+                    width: 50vw ;
+                    max-width: 50vw !important;
+                }
+            </style>
+        </head>
+        <body>
+            <div id="swagger-ui"></div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-bundle.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-standalone-preset.js"></script>
+            <script>
+                window.onload = function() {
+                    var spec = {"openapi":"3.0.3","info":{"title":"Events API","version":"1.0.0"},"servers":[{"url":"http://localhost:4000"}],"paths":{"/api/events":{"get":{"summary":"Získá seznam všech událostí","responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventsListResponse"}}}}}},"post":{"summary":"Vytvoří novou událost","requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateEventRequest"}}}},"responses":{"201":{"description":"Událost byla vytvořena","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PollingEvent"}}}},"400":{"description":"Nevalidní vstup"},"422":{"description":"Chybí data (např. prázdné datumy)"},"500":{"description":"Server error"}}}},"/api/events/{id}":{"get":{"summary":"Získat detail konkrétní události","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer"}}],"responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PollingEvent"}}}},"400":{"description":"Nevalidní ID"},"404":{"description":"Událost nenalezena"}}}}},"components":{"schemas":{"UserRecord":{"type":"object","required":["name","answer"],"properties":{"name":{"type":"string"},"answer":{"type":"string","enum":["yes","no","if-needed"]}}},"DateRecord":{"type":"object","required":["timestamp","records"],"properties":{"timestamp":{"type":"integer","format":"int64"},"records":{"type":"array","items":{"$ref":"#/components/schemas/UserRecord"}}}},"PollingEvent":{"type":"object","required":["id","title","dates"],"properties":{"id":{"type":"integer"},"title":{"type":"string"},"location":{"type":"string"},"dates":{"type":"array","items":{"$ref":"#/components/schemas/DateRecord"}}}},"CreateEventRequest":{"type":"object","required":["title","dates"],"properties":{"name":{"type":"string"},"location":{"type":"string"},"title":{"type":"string"},"dates":{"type":"array","items":{"type":"integer","format":"int32"}}}},"EventsListResponse":{"type":"object","properties":{"items":{"type":"array","items":{"$ref":"#/components/schemas/PollingEvent"}}}},"Error":{"type":"object","properties":{"error":{"type":"string"}}}}}};
+                    const ui = SwaggerUIBundle({
+                        spec: spec,
+                        dom_id: '#swagger-ui',
+                        deepLinking: true,
+                        presets: [
+                            SwaggerUIBundle.presets.apis,
+                            SwaggerUIStandalonePreset
+                        ],
+                        plugins: [
+                            SwaggerUIBundle.plugins.DownloadUrl
+                        ],
+                        layout: "StandaloneLayout"
+                    });
+                    window.ui = ui;
+                }
+            </script>
+        </body>
+    </html>
+    

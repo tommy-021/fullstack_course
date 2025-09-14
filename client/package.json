@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "openapi-fetch": "^0.14.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^6.26.1",
