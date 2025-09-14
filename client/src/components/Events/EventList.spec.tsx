@@ -1,43 +1,76 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { EventsList } from './EventsList';
-import type { PollingEvent } from './types';
 
-describe('EventsList', () => {
-    const data: PollingEvent[] = [
-        { id: '1', title: 'Tým building', location: 'Praha', dates: [] },
-        { id: '2', title: 'Planning', dates: [] },
-    ];
-
-    test('vykreslí seznam událostí jako odkazy', () => {
-        render(
-            <MemoryRouter>
-                <EventsList data={data} />
-            </MemoryRouter>,
-        );
-
-        // oba názvy událostí se zobrazí
-        expect(screen.getByText('Tým building')).toBeInTheDocument();
-        expect(screen.getByText('Planning')).toBeInTheDocument();
-
-        // odkazy mají správné href
-        expect(screen.getByRole('link', { name: 'Tým building' })).toHaveAttribute(
-            'href',
-            '/events/1',
-        );
-        expect(screen.getByRole('link', { name: 'Planning' })).toHaveAttribute(
-            'href',
-            '/events/2',
-        );
+describe('EventsList (API)', () => {
+    afterEach(() => {
+        (global.fetch as jest.Mock | undefined)?.mockClear?.();
     });
 
-    test('zobrazí placeholder když není žádná událost', () => {
+    test('načte a vykreslí seznam událostí + správné odkazy', async () => {
+        global.fetch = jest.fn(async (url: string) => {
+            if (url.includes('/api/events')) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        items: [
+                            { id: 1, title: 'Super akce', dates: [] },
+                            { id: 'abc def', title: 'Planning', dates: [] },
+                        ],
+                    }),
+                } as Response;
+            }
+            return { ok: false, json: async () => ({}) } as Response;
+        }) as jest.Mock;
+
         render(
             <MemoryRouter>
-                <EventsList data={[]} />
+                <EventsList />
             </MemoryRouter>,
         );
 
-        expect(screen.getByText(/žádné události/i)).toBeInTheDocument();
+        // loading stav
+        expect(screen.getByText(/načítám události/i)).toBeInTheDocument();
+
+        // data
+        await waitFor(() => {
+            expect(screen.getByText('Super akce')).toBeInTheDocument();
+            expect(screen.getByText('Planning')).toBeInTheDocument();
+        });
+
+        // odkazy
+        expect(screen.getByRole('link', { name: 'Super akce' }))
+            .toHaveAttribute('href', '/events/1');
+        expect(screen.getByRole('link', { name: 'Planning' }))
+            .toHaveAttribute('href', '/events/abc%20def');
+    });
+
+    test('zobrazí placeholder při prázdném seznamu', async () => {
+        global.fetch = jest.fn(async () => ({
+            ok: true,
+            json: async () => ({ items: [] }),
+        })) as jest.Mock;
+
+        render(
+            <MemoryRouter>
+                <EventsList />
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText(/žádné události/i)).toBeInTheDocument();
+    });
+
+    test('zobrazí chybu, když API selže', async () => {
+        global.fetch = jest.fn(async () => ({
+            ok: false,
+            status: 500,
+            json: async () => ({}),
+        })) as jest.Mock;
+
+        render(
+            <MemoryRouter>
+                <EventsList />
+            </MemoryRouter>,
+        );
+        expect(await screen.findByRole('alert')).toHaveTextContent(/nepodařilo se načíst/i);
     });
 });
