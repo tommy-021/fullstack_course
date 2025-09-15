@@ -1,30 +1,30 @@
 import { Router } from 'express';
-import { db } from '../data';
+import { getEvents, getEvent as getEventDb, addEvent } from '../db/events';
 
 export const eventsRouter = Router();
 
 // GET /api/events
 eventsRouter.get('/', (_req, res) => {
-    res.json(db);
+    const items = getEvents();
+    res.json({ items });
 });
 
 // GET /api/events/:id
 eventsRouter.get('/:id', (req, res) => {
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' }); // 400 Bad Request - špatný formát dat (např. id není číslo, payload nemá title)
-    const ev = db.items.find((e) => e.id === id);
-    if (!ev) return res.status(404).json({ error: 'Not found' }); // 404 Not Found - událost podle ID neexistuje
+    if (Number.isNaN(id)) return res.status(400).json({ error: 'Invalid id' }); // 400 Bad Request
+
+    const ev = getEventDb(id);
+    if (!ev) return res.status(404).json({ error: 'Not found' }); // 404 Not Found
     res.json(ev);
 });
-
-// Pomocná proměnná pro generování ID (naváže na nejvyšší existující id)
-let nextId = Math.max(...db.items.map((e) => e.id), 0) + 1;
 
 // Základní validace payloadu z formuláře
 function isCreatePayload(b: any): b is {
     title: string;
     location?: string;
-    dates: number[]; } {
+    dates: number[];
+} {
     return (
         b
         && typeof b.title === 'string'
@@ -35,7 +35,7 @@ function isCreatePayload(b: any): b is {
 }
 
 // POST /api/events
-// přidá novou událost ... kam skutečně uloží???
+// přidá novou událost do DB
 eventsRouter.post('/', (req, res) => {
     const body = req.body;
 
@@ -45,14 +45,16 @@ eventsRouter.post('/', (req, res) => {
 
     try {
         const newEvent = {
-            id: nextId++,
+            id: 0, // DB nastaví skutečné ID
             title: body.title.trim(),
             location: body.location || undefined,
             dates: body.dates.map((ts: number) => ({ timestamp: ts, records: [] })),
         };
 
-        db.items.push(newEvent);
-        return res.status(201).json(newEvent);
+        const newId = addEvent(newEvent);
+        const created = getEventDb(Number(newId));
+
+        return res.status(201).json(created ?? { ...newEvent, id: Number(newId) });
     }
     catch {
         return res.status(500).json({ error: 'Internal server error' });

@@ -11,7 +11,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
@@ -29,6 +30,7 @@
     "typescript-eslint": "^8.41.0"
   },
   "dependencies": {
+    "better-sqlite3": "^12.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   }
