@@ -1,9 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+import { createSchema } from './db/events';
 import { eventsRouter } from './routes/events';
 
 const port = 4000;
 const app = express();
+
+createSchema();
+
 app.use(cors({ origin: true }));
 app.use(express.json());
 
