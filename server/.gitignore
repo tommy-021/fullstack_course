@@ -1,5 +1,5 @@
 # My ignored files
 /node_modules/
 /dist/
-/events.db/
+/events.db
 /src/db/injection_test.ts
